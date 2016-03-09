@@ -4,8 +4,6 @@ var _ = require('underscore');
 // var mongoose = require('mongoose');
 // var Article = mongoose.model('Article')
 var Article = require('../models/articleModel.js')
-// note that typically data would NOT be loaded from the filesystem in this manner :)
-
 router.get('/articles', function(req, res, next) {
 	// var fs = require('fs');
 	// var obj;
@@ -40,7 +38,6 @@ router.get('/articles/:id', function(req, res, next) {
 });
 
 router.get('/categories',function(req, res, next) {
-
 	Article.find({},{category:1}, function(err, data) {
 		res.send(data);
 	})

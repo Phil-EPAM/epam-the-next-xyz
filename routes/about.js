@@ -1,9 +1,10 @@
-var article = require('../models/articleModel.js');
 
-article.getCategories = function(returndata) {
-  article.find({},{category:1}, function(err, data) {
-      returndata(data);
-  })
+var article = require('../controllers/aboutController.js')
+
+
+// module.exports = article;
+
+
+module.exports = function(app) {
+  app.get('/about',article)
 }
-
-module.exports = article;
