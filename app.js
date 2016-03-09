@@ -70,7 +70,6 @@ app.get('/about', function(req, res) {
   var category = require('./routes/about.js');
   category.getCategories(function(data) {
     res.render("about", {categories: data});
-    // res.send(data)
   })
 });
 
@@ -85,13 +84,10 @@ app.use('/articles/:id', function(req, res, next) {
   //   data = _.filter(JSON.parse(data), function(item) {
   //     return item.id == req.params.id;
   //   });
-  res.locals.scripts.push('/js/main.js');
+  res.locals.scripts.push('/js/home.js');
   res.render("article",{articleId:req.params.id});
   // });
 });
-
-
-
 
 
 
@@ -104,8 +100,13 @@ app.get('/register', function(req, res) {
 app.post('/register', function(req, res) {
   var user = require('./models/User.js');
   var userInstance = new user(req.body);
+  // user(req.body);
   userInstance.save(function(err, docs) {
-      console.log("good!!");
+      if (err) {
+        return err
+      } else {
+        console.log("good!!");
+      }
       res.redirect('/dashboard');
   })
   // user.create(req.body,function(err, doc){
@@ -118,7 +119,23 @@ app.post('/register', function(req, res) {
 
 // respond to the get request with dashboard page (and pass in some data into the template / note this will be rendered server-side)
 app.get('/dashboard', function (req, res) {
+    res.locals.scripts.push('/js/dashboard.js');
     res.render('dashboard');
+});
+
+app.post('/dashboard', function (req, res) {
+    console.log("I am posting")
+    var article = require('./models/articleModel.js')
+    var articleInstance = new article(req.body);
+    console.log(req.body)
+    articleInstance.save(function(err, docs) {
+      if (err) {
+        return err
+      } else {
+        console.log("good!!");
+      }
+      res.redirect('/dashboard');
+  })
 });
 
 // the api (note that typically you would likely organize things a little differently to this)
