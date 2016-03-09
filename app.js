@@ -1,6 +1,25 @@
 // include and setup express
 var express = require('express');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+// connect to MongoDB
+mongoose.connect('mongodb://localhost/TheNextCar');
+
+
+var article = require('./models/articleModel.js')
+// var Schema = mongoose.Schema;
+
+// //Create a Schema for Articles
+// var ArticleSchema = new Schema({
+//   title: String,
+//   url: String,
+//   image: String,
+//   username: String,
+//   date: Date
+// });
+
+// mongoose.model('Article',ArticleSchema);
+// var article = mongoose.model('Article')
 
 // include express handlebars (templating engine)
 var exphbs  = require('express-handlebars');
@@ -17,22 +36,64 @@ var api = require('./routes/api');
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-// express middleware that parser the key-value pairs sent in the request body in the format of our choosing (e.g. json) 
+// express middleware that parser the key-value pairs sent in the request body in the format of our choosing (e.g. json)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // setup our public directory (which will serve any file stored in the 'public' directory)
 app.use(express.static('public'));
 
+//add local scripts
+app.use(function (req, res, next) {
+  res.locals.scripts = [];
+  next();
+});
+
 // respond to the get request with the home page
-app.get('/', function (req, res) {
+app.get('/', function(req, res, next) {
+  // var fs = require('fs');
+  // var obj;
+  // fs.readFile('./data/articles.json', 'utf8', function (err, data) {
+  //   if (err) throw err;
+  //   var articles = JSON.parse(data);
+  // push js to that specific page.
+    res.locals.scripts.push('/js/home.js');
+    // article.find({},null,function(err,docs){
+    //   res.render('home',{items: docs});
+    // })
     res.render('home');
+  // });
 });
 
 // respond to the get request with the about page
 app.get('/about', function(req, res) {
-  res.render('about');
+  var category = require('./routes/about.js');
+  category.getCategories(function(data) {
+    res.render("about", {categories: data});
+    // res.send(data)
+  })
 });
+
+
+app.use('/articles/:id', function(req, res, next) {
+// res.end(req.params.id);
+  // var _ = require('underscore');
+  // var fs = require('fs');
+  // fs.readFile('./data/articles.json', 'utf8', function (err, data) {
+  //   if (err) throw err;
+
+  //   data = _.filter(JSON.parse(data), function(item) {
+  //     return item.id == req.params.id;
+  //   });
+  res.locals.scripts.push('/js/main.js');
+  res.render("article",{articleId:req.params.id});
+  // });
+});
+
+
+
+
+
 
 // respond to the get request with the register page
 app.get('/register', function(req, res) {
@@ -41,21 +102,23 @@ app.get('/register', function(req, res) {
 
 // handle the posted registration data
 app.post('/register', function(req, res) {
-
-  // get the data out of the request (req) object 
+  var user = require('./models/User.js');
+  var userInstance = new user(req.body);
+  userInstance.save(function(err, docs) {
+      console.log("good!!");
+      res.redirect('/dashboard');
+  })
+  // user.create(req.body,function(err, doc){
+  //   if(err)
+  // })
+  // get the data out of the request (req) object
   // store the user in memory here
 
-  res.redirect('/dashboard');
 });
 
 // respond to the get request with dashboard page (and pass in some data into the template / note this will be rendered server-side)
 app.get('/dashboard', function (req, res) {
-    res.render('dashboard', {
-    	stuff: [{
-		    greeting: "Hello",
-		    subject: "World!"
-		}]
-    });
+    res.render('dashboard');
 });
 
 // the api (note that typically you would likely organize things a little differently to this)

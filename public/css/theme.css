@@ -20,7 +20,7 @@ body {
 /* Navigation style */
 
 .navbar-inverse {
-	background-image: linear-gradient(to bottom, #D9260F 0, #B81208 100%);
+	/*background-image: linear-gradient(to bottom, #D9260F 0, #B81208 100%);*/
 	border-color: #666666;
 }
 
@@ -29,7 +29,7 @@ body {
 }
 
 .navbar-inverse .navbar-brand:hover {
-	color: orange;
+	color: salmon;
 }
 
 .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a {
@@ -49,3 +49,12 @@ body {
   height: 60px;
   margin-bottom: 30px;
 }
+
+#articles img {
+width:  100%;
+  height: 300px;
+}
+
+/*.articles {
+  height: 500px;
+}*/

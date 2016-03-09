@@ -9,16 +9,17 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>The Next XYZ</title>
+    <title>The Next G-Car</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="css/theme.css" rel="stylesheet">
+    <link href="/css/theme.css" rel="stylesheet">
   </head>
 
   <body>
+  <div id='ajax'></div>
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -55,5 +56,8 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+
+    {{#each scripts}}<script src="{{this}}"></script>{{/each}}
+    <script type="text/javascript" src = "/js/handlebars-v4.0.5.js"></script>
   </body>
 </html>
