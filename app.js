@@ -2,6 +2,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var crypto = require('crypto');
 // crethe the express app
 var app = express();
 // connect to MongoDB
@@ -9,52 +10,15 @@ mongoose.connect('mongodb://localhost/TheNextCar');
 
 require('./controllers/passportController.js')(app);
 
-// var User = require('./models/User.js');
-// var cookieParser = require('cookie-parser');
-// var session = require('express-session');
-// var flash = require('express-flash');
-// var passport = require('passport');
-
-// app.use(cookieParser());
-// app.use(session({ secret: 'keyboard cat' , resave: false, saveUninitialized: false}));
-// app.use(passport.initialize());
-// app.use(passport.session());
-// app.use(flash());
-
-
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
 
-// passport.use(new LocalStrategy(
-//   function(username, password, done) {
-//     User.findOne({ username: username }, function(err, user) {
-//       if (err) {
-//         console.log("err occurs")
-//         return done(err); }
-//       if (!user) {
-//         console.log("No Users");
-//         return done(null, false, { message: 'Incorrect username.' });
-//       }
-//       if (!user.validPassword(password)) {
-//         return done(null, false, { message: 'Incorrect password.' });
-//       }
-//       return done(null, user);
-//     });
-//   }
-// ));
-
-// passport.serializeUser(function(user, done) {
-//   done(null, user.id);
-// });
-
-// passport.deserializeUser(function(id, done) {
-//   User.findById(id, function(err, user) {
-//     done(err, user);
-//   });
-// });
-
-
-
+var isAuthenticated = function (req,res,next) {
+    if (req.isAuthenticated()){
+      console.log('hey I am authenticated')
+    } return next();
+    ;
+}
 // include express handlebars (templating engine)
 var exphbs  = require('express-handlebars');
 
@@ -82,42 +46,28 @@ app.use(express.static('public'));
 //add local scripts
 app.use(function (req, res, next) {
   res.locals.scripts = [];
-
  if (req.user) {
   res.locals.user = req.user;
  }
-
-
-
   next();
 });
 
 // respond to the get request with the home page
-app.get('/', function(req, res, next) {
+app.get('/',isAuthenticated ,function(req, res, next) {
+    console.log('I am authenticated at')
     res.locals.scripts.push('/js/home.js');
-    // article.find({},null,function(err,docs){
-    //   res.render('home',{items: docs});
-    // })
     res.render('home');
 });
 
 // respond to the get request with the about page
 require('./routes/about')(app);
-app.use('/articles/:id', function(req, res, next) {
-// res.end(req.params.id);
-  // var _ = require('underscore');
-  // var fs = require('fs');
-  // fs.readFile('./data/articles.json', 'utf8', function (err, data) {
-  //   if (err) throw err;
 
-  //   data = _.filter(JSON.parse(data), function(item) {
-  //     return item.id == req.params.id;
-  //   });
+app.use('/articles/:id', function(req, res, next) {
+
   res.locals.scripts.push('/js/home.js');
   res.render("article",{articleId:req.params.id});
   // });
 });
-
 
 // respond to the get request with the register page
 app.get('/register', function(req, res) {
@@ -128,7 +78,6 @@ app.get('/register', function(req, res) {
 app.post('/register', function(req, res) {
   var User = require('./models/User.js');
   var userInstance = new User(req.body);
-  // user(req.body);
   userInstance.save(function(err, docs) {
       if (err) {
         return err
@@ -137,12 +86,6 @@ app.post('/register', function(req, res) {
       }
       res.redirect('/dashboard');
   })
-  // user.create(req.body,function(err, doc){
-  //   if(err)
-  // })
-  // get the data out of the request (req) object
-  // store the user in memory here
-
 });
 
 // respond to the get request with dashboard page (and pass in some data into the template / note this will be rendered server-side)
@@ -167,7 +110,6 @@ app.post('/dashboard', function (req, res) {
   })
 });
 
-
 app.get('/login', function(req, res) {
     res.render('login');
   });
@@ -178,7 +120,6 @@ app.post('/login',
                                    failureFlash: true })
 );
 
-// the api (note that typically you would likely organize things a little differently to this)
 app.use('/api', api);
 
 // create the server based on express
@@ -188,3 +129,23 @@ var server = require('http').createServer(app);
 server.listen(1337, '127.0.0.1', function () {
   console.log('The Next XYZ is looking good! Open http://localhost:%d to begin.', 1337);
 });
+
+
+
+var isAuthenticated = function (req,res,next) {
+    if (req.isAuthenticated()) return next();
+    res.redirect('/login');
+}
+
+
+
+
+// res.end(req.params.id);
+  // var _ = require('underscore');
+  // var fs = require('fs');
+  // fs.readFile('./data/articles.json', 'utf8', function (err, data) {
+  //   if (err) throw err;
+
+  //   data = _.filter(JSON.parse(data), function(item) {
+  //     return item.id == req.params.id;
+  //   });
