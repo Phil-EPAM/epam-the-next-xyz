@@ -1,14 +1,13 @@
 var article = require('../models/articleModel.js');
 
-// article.getCategories = function(returndata) {
-//   article.find({},{category:1}, function(err, data) {
-//       returndata(data);
-//   })
-// }
-
 var categories = function(req, res) {
+  console.log('about page isAuthenticated')
+  if (req.isAuthenticated()){
     article.find({},{category:1}, function(err, data) {
-      res.render("about", {categories: data});
+      res.render("about", {categories: data, user: req.user});
     });
+  } else {
+      res.render("about")
+  }
 };
 module.exports = categories;

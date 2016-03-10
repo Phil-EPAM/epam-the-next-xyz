@@ -13,7 +13,6 @@ router.get('/articles', function(req, res, next) {
 	// });
 	res.header('Access-Control-Allow-Origin','*');
 	res.header('Access-Control-Allow-Headers','X-Requested-With')
-	console.log('now is using mongoose')
 	Article.find({},null,{sort:{date:-1}}, function(err, data) {
 		res.json(data);
 	})
